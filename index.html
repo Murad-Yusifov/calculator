@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculator</title>
-    <link rel="stylesheet" href="index.css" />
+    <!-- <link rel="stylesheet" href="index.css" /> -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -12,13 +12,145 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <style>
+      @charset "UTF-8";
+      body {
+        background-color: black;
+        color: white;
+      }
+
+      .wrapper {
+        height: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        gap: 1rem;
+      }
+
+      .result {
+        width: 90%;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .resultShow {
+        text-align: end;
+        font-size: 20px;
+      }
+
+      #value {
+        height: 80px;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        color: white;
+        text-align: end;
+        font-size: 30px;
+      }
+
+      /* 2:1 nisbət */
+      .calculate {
+        width: 90%;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+      }
+
+      /* Numbers bölməsi */
+      .numbers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+
+      .row {
+        display: contents;
+      }
+
+      .number {
+        width: 70%;
+        height: 70%;
+        padding: 10px;
+        border: 1px solid white;
+        border-radius: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 30px;
+        transform: 0.3s;
+      }
+      .number:hover {
+        transform: 0.3s;
+        background-color: rgba(117, 117, 117, 0.192);
+      }
+
+      /* Arthmatic hissə */
+      .arthmatic {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        align-self: center;
+      }
+
+      .add {
+        padding: 0.5rem;
+        border: 1px solid white;
+        border-radius: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .add:nth-child(2),
+      .add:nth-child(4),
+      .add:nth-child(6),
+      .add:nth-child(7),
+      .add:nth-child(8) {
+        background-color: #ff9f0a;
+        padding: 1.2rem;
+        font-size: 30px;
+      }
+      .add:nth-child(2):hover,
+      .add:nth-child(4):hover,
+      .add:nth-child(6):hover,
+      .add:nth-child(7):hover,
+      .add:nth-child(8):hover {
+        transition: 0.3s;
+        opacity: 0.9;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .add:nth-child(3),
+      .add:nth-child(5),
+      .add:nth-child(1) {
+        padding: 1.2rem;
+        transition: 0.3s;
+        font-size: 30px;
+      }
+      .add:nth-child(3):hover,
+      .add:nth-child(5):hover,
+      .add:nth-child(1):hover {
+        transition: 0.3s;
+        background-color: rgba(117, 117, 117, 0.192);
+      }
+    </style>
   </head>
   <body>
     <div class="wrapper">
       <!-- numbers -->
       <div class="result">
         <span class="resultShow"></span>
-        <input  type="number" id="value" max="9999999" min="0" readonly/>
+        <input type="number" id="value" max="9999999" min="0" readonly />
       </div>
       <!-- calculate section -->
       <div class="calculate">
@@ -48,17 +180,90 @@
         </div>
         <!-- arithmancy -->
         <div class="arthmatic">
-        <div class="add ">AC</div>
-        <div class="add ">÷</div>
-        <div class="add ">So</div>
-        <div class="add ">X</div>
-        <div class="add ">%</div>
-        <div class="add ">-</div>
-        <div class="add ">=</div>
-        <div class="add ">+</div>
+          <div class="add">AC</div>
+          <div class="add">÷</div>
+          <div class="add">So</div>
+          <div class="add">X</div>
+          <div class="add">%</div>
+          <div class="add">-</div>
+          <div class="add">=</div>
+          <div class="add">+</div>
         </div>
       </div>
     </div>
-    <script src="index.js"></script>
+    <script>
+      let results = document.querySelector(".resultShow");
+      let input = document.getElementById("value");
+      let numbers = document.querySelectorAll(".number");
+
+      let added = document.querySelectorAll(".add");
+
+      let currentValue = "";
+      let operator = "";
+      let firstNumber = "";
+
+      numbers.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          let value = btn.textContent.trim();
+
+          if (value === ".") {
+            if (!input.value.includes(".")) {
+              input.value += input.value === "" ? "0." : ".";
+            }
+          } else {
+            input.value += value;
+          }
+        });
+      });
+
+      added.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          let symbol = btn.textContent.trim();
+
+          if (symbol === "AC") {
+            input.value = "";
+            currentValue = "";
+            operator = "";
+            firstNumber = "";
+          } else if (symbol === "=") {
+            let secondNumber = input.value;
+            let result;
+
+            switch (operator) {
+              case "+":
+                result = Number(firstNumber) + Number(secondNumber);
+                break;
+              case "×":
+              case "x":
+              case "X":
+                result = Number(firstNumber) * Number(secondNumber);
+
+                break;
+              case "÷":
+              case "/":
+                result = Number(firstNumber) / Number(secondNumber);
+                break;
+              case "%":
+                result = Number(firstNumber) % Number(secondNumber);
+                break;
+            }
+            input.value = result;
+            currentValue = result;
+            results.textContent = `${firstNumber} ${operator} ${secondNumber}`;
+          } else {
+            operator = symbol;
+            firstNumber = input.value;
+            input.value = "";
+          }
+        });
+      });
+
+      console.log(
+        "operator:",
+        JSON.stringify(operator),
+        "length:",
+        operator.length
+      );
+    </script>
   </body>
 </html>
